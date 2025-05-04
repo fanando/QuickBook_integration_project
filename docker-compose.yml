@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: qbo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  api-service:
+    build: ./api-service
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - REDIRECT_URI=${REDIRECT_URI}
+      - QBO_SANDBOX_BASE=${QBO_SANDBOX_BASE}
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api-service:/app
+    restart: always
+
+  crawler-service:
+    build: ./crawler-service
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - QBO_SANDBOX_BASE=${QBO_SANDBOX_BASE}
+    # depends_on:
+    #   - postgres
+    volumes:
+      - ./crawler-service:/app
+    restart: always
+
+volumes:
+  postgres-data:
