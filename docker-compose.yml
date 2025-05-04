@@ -11,6 +11,25 @@ services:
       - postgres-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  pg-backup:
+    image: postgres:15
+    depends_on:
+      - postgres
+    environment:
+      - PGPASSWORD=postgres
+    volumes:
+      - ./pg_backups:/backups  
+    entrypoint: >
+      bash -c '
+        mkdir -p /backups &&
+        while true; do
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          pg_dump -h postgres -U postgres -d qbo > /backups/backup_$TIMESTAMP.sql
+          echo "Backup saved: backup_$TIMESTAMP.sql"
+          sleep 3600  # every hour
+        done
+      '
+
   api-service:
     build: ./api-service
     environment:
