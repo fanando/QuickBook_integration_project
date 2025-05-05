@@ -4,8 +4,9 @@ from fastapi.responses import RedirectResponse, JSONResponse
 import requests
 import secrets
 import time
-from typing import Optional
-
+from typing import Optional,Tuple
+from datetime import datetime, timedelta
+from .db import get_stored_token
 from .config import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
 from .qb_client import save_tokens
 
@@ -29,8 +30,7 @@ def authorize() -> RedirectResponse:
         key="oauth_state",
         value=state,
         httponly=True,
-        secure=False,    
-        samesite="lax", 
+        secure=True
     )
     return response
 
@@ -78,6 +78,30 @@ def callback(
     }
     save_tokens(token_record)
 
-    response = JSONResponse({"status": "tokens_saved", "realmId": realmId})
-    response.delete_cookie("oauth_state")
+    response = JSONResponse({"status": "tokens_saved",
+                            "realmId": realmId,
+                            "expires_in":tokens['expires_in'],
+                            "access_token":tokens['access_token']})
+    response.set_cookie(
+        key="oauth_state",
+        value=state,
+        httponly=True,
+        secure=True
+    )
     return response
+
+def is_token_valid(provided_token: str, stored: Tuple[str, int, datetime]) -> bool:
+    stored_token, expires_in, issued_at = stored
+    expiry_time = issued_at + timedelta(seconds=expires_in)
+    return provided_token == stored_token and datetime.utcnow() < expiry_time
+
+def require_valid_token(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or malformed Authorization header")
+
+    provided_token = auth_header.split(" ")[1]
+    stored_token = get_stored_token(provided_token)
+
+    if not stored_token or not is_token_valid(provided_token, stored_token):
+        raise HTTPException(status_code=401, detail="Invalid or expired token")

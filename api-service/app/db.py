@@ -4,7 +4,7 @@ import json
 from typing import List
 from .models import Account
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional,Tuple
 def get_connection():
     return psycopg2.connect(os.getenv("DATABASE_URL"))
 
@@ -60,3 +60,25 @@ def get_accounts(prefix: str = "") -> List[Account]:
         return [Account(**row[0]) for row in rows]
     except psycopg2.errors.UndefinedColumn:
         return []
+    
+def get_stored_token(user_token: str) -> Optional[Tuple[str, int, datetime]]:
+    conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT access_token, expires_in, issued_at
+        FROM token_store
+        WHERE access_token = %s
+        LIMIT 1
+        """,
+        (user_token,),
+    )
+    row = cur.fetchone()
+    conn.close()
+
+    if not row:
+        return None
+
+    access_token, expires_in, issued_at = row
+    issued_at_dt = datetime.fromtimestamp(issued_at) if isinstance(issued_at, float) else issued_at
+    return access_token, expires_in, issued_at_dt
