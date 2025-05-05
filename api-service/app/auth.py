@@ -47,7 +47,10 @@ def callback(
         raise HTTPException(status_code=400, detail=error)
 
     original_state: Optional[str] = request.cookies.get("oauth_state")
-    if not state or state != original_state:
+    if not original_state:
+        original_state = state #fallback for query params 
+    
+    if not state or state!=original_state:
         raise HTTPException(status_code=400, detail="Invalid or missing state parameter")
 
     token_url: str = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
@@ -101,7 +104,9 @@ def require_valid_token(request: Request):
         raise HTTPException(status_code=401, detail="Missing or malformed Authorization header")
 
     provided_token = auth_header.split(" ")[1]
+    print('provided_token',provided_token)
     stored_token = get_stored_token(provided_token)
+    print("stored_token",stored_token)
 
     if not stored_token or not is_token_valid(provided_token, stored_token):
         raise HTTPException(status_code=401, detail="Invalid or expired token")

@@ -11,6 +11,7 @@ from .config import START_UP_PERIOD
 from .auth import router as auth_router,require_valid_token
 from .models import Account
 from .db import get_accounts, init_db, save_accounts_cache
+from fastapi.middleware.cors import CORSMiddleware
 
 
 
@@ -18,6 +19,13 @@ limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(title="Accounts API Service")
 app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
+app.add_middleware(
+     CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def startup_event() -> None:
