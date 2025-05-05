@@ -27,7 +27,7 @@ This project integrates QuickBooks Online with a Python FastAPI backend and a Re
 1. **Clone the repo**
 
 ```bash
-git clone https://github.com/yourusername/quickbooks-integration.git
+git clone https://github.com/fanando/QuickBook_integration_project.git
 cd quickbooks-integration
 ```
 
@@ -59,8 +59,8 @@ docker-compose up --build
 
 | Mode      | USE_UI | Access via                     |
 |-----------|--------|--------------------------------|
-| UI Mode   | 1   | `http://localhost:3000`        |
-| API Mode  | 0   | Use Postman on port `8000`     |
+| UI Mode   | 1     | `http://localhost:3000`        |
+| API Mode  | 0     | Use Postman on port `8000`     |
 
 > When `USE_UI=1`, the app launches a React interface.  
 > When `USE_UI=0`, you can test endpoints using Postman or cURL.
