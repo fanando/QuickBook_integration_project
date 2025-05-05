@@ -1,4 +1,4 @@
-version: "3.9"
+
 services:
   postgres:
     image: postgres:15
@@ -38,6 +38,7 @@ services:
       - CLIENT_SECRET=${CLIENT_SECRET}
       - REDIRECT_URI=${REDIRECT_URI}
       - QBO_SANDBOX_BASE=${QBO_SANDBOX_BASE}
+      - START_UP_PERIOD=${START_UP_PERIOD}
     depends_on:
       - postgres
     ports:
@@ -53,6 +54,7 @@ services:
       - CLIENT_ID=${CLIENT_ID}
       - CLIENT_SECRET=${CLIENT_SECRET}
       - QBO_SANDBOX_BASE=${QBO_SANDBOX_BASE}
+      - START_UP_PERIOD=${START_UP_PERIOD}
     # depends_on:
     #   - postgres
     volumes:

@@ -1,13 +1,13 @@
 # app/main.py
 
 import asyncio
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
-
+from .config import START_UP_PERIOD
 from .auth import router as auth_router
 from .models import Account
 from .db import get_accounts, init_db, save_accounts_cache
@@ -19,7 +19,14 @@ app.add_middleware(SlowAPIMiddleware)
 
 @app.on_event("startup")
 async def startup_event() -> None:
-    init_db()
+    db_ready = False
+    while not db_ready:
+        try:
+            init_db()
+            db_ready = True
+        except Exception as e:
+            print("Waiting for DB to be ready...", flush=True)
+            await asyncio.sleep(START_UP_PERIOD)
 
     try:
         all_accounts = get_accounts(prefix="")

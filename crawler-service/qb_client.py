@@ -33,6 +33,15 @@ def load_tokens() -> Optional[Dict[str, Any]]:
         "issued_at": issued_at,
     }
 
+def has_tokens() -> bool:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT 1 FROM token_store LIMIT 1")
+    result = cur.fetchone()
+    conn.close()
+    return result is not None
+
+
 def save_tokens(tokens: Dict[str, Any]) -> None:
     conn = get_connection()
     cur = conn.cursor()

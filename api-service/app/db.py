@@ -12,7 +12,7 @@ def init_db() -> None:
     try:
         conn = get_connection()
         cur = conn.cursor()
-
+        print('initating token_store db',flush=True)
         cur.execute("""
             CREATE TABLE IF NOT EXISTS token_store (
                 realm_id TEXT PRIMARY KEY,
@@ -22,19 +22,13 @@ def init_db() -> None:
                 issued_at DOUBLE PRECISION NOT NULL
             );
         """)
-
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS accounts (
-                id SERIAL PRIMARY KEY,
-                email TEXT UNIQUE,
-                created_at TIMESTAMP DEFAULT NOW()
-            );
-        """)
-
+    
         conn.commit()
         conn.close()
+        print('finished token_store db',flush=True)
     except Exception as e:
         print("Failed to initialize api-service DB:", e, flush=True)
+        raise e
 
 def save_accounts_cache(all_accounts: List[Dict[str, Any]]) -> None:
     conn = get_connection()
@@ -59,7 +53,10 @@ def save_accounts_cache(all_accounts: List[Dict[str, Any]]) -> None:
 def get_accounts(prefix: str = "") -> List[Account]:
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT payload FROM accounts WHERE payload->>'Name' LIKE %s", (prefix + "%",))
-    rows = cur.fetchall()
-    conn.close()
-    return [Account(**row[0]) for row in rows]
+    try:
+        cur.execute("SELECT payload FROM accounts WHERE payload->>'Name' LIKE %s", (prefix + "%",))
+        rows = cur.fetchall()
+        conn.close()
+        return [Account(**row[0]) for row in rows]
+    except psycopg2.errors.UndefinedColumn:
+        return []

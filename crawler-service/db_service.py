@@ -9,20 +9,10 @@ def get_connection():
     return psycopg2.connect(os.getenv("DATABASE_URL"))
 
 def init_db() -> None:
-    print("🔧 Initializing DB...",flush=True)
     try:
         conn = get_connection()
         
         cur = conn.cursor()
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS token_store (
-                realm_id TEXT PRIMARY KEY,
-                access_token TEXT NOT NULL,
-                refresh_token TEXT NOT NULL,
-                expires_in INTEGER NOT NULL,
-                issued_at DOUBLE PRECISION NOT NULL
-            );
-        """)
         cur.execute("""
             CREATE TABLE IF NOT EXISTS accounts (
                 id TEXT PRIMARY KEY,
@@ -32,9 +22,10 @@ def init_db() -> None:
         """)
         conn.commit()
         conn.close()
-        print("✅ DB initialized.",flush=True)
+        print("DB initialized.",flush=True)
     except Exception as e:
-        print("❌ Failed to initialize DB:", e,flush=True)
+        print("Failed to initialize DB:", e,flush=True)
+        raise e
 
 def load_tokens() -> Optional[Dict[str, Any]]:
     conn = get_connection()
