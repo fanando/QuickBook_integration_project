@@ -40,7 +40,7 @@ REDIRECT_URI=http://localhost:8000/auth/callback
 QBO_SANDBOX_BASE=https://sandbox-quickbooks.api.intuit.com
 START_UP_PERIOD=5
 DATABASE_URL=postgresql://postgres:postgres@postgres:5432/qbo
-USE_UI=True
+USE_UI=1
 ```
 
 > 💡 You get your `CLIENT_ID` and `CLIENT_SECRET` from [QuickBooks Developer Console](https://developer.intuit.com/app/developer/homepage) by registering a new app.
