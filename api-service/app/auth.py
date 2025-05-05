@@ -105,9 +105,6 @@ def require_valid_token(request: Request):
         raise HTTPException(status_code=401, detail="Missing or malformed Authorization header")
 
     provided_token = auth_header.split(" ")[1]
-    print('provided_token',provided_token)
     stored_token = get_stored_token(provided_token)
-    print("stored_token",stored_token)
-
     if not stored_token or not is_token_valid(provided_token, stored_token):
         raise HTTPException(status_code=401, detail="Invalid or expired token")

@@ -27,7 +27,6 @@ def init_db() -> None:
         conn.close()
         print('finished token_store db',flush=True)
     except Exception as e:
-        print("Failed to initialize api-service DB:", e, flush=True)
         raise e
 
 def save_accounts_cache(all_accounts: List[Dict[str, Any]]) -> None:
