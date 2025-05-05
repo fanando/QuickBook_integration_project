@@ -19,16 +19,8 @@ services:
       - PGPASSWORD=postgres
     volumes:
       - ./pg_backups:/backups  
-    entrypoint: >
-      bash -c '
-        mkdir -p /backups &&
-        while true; do
-          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          pg_dump -h postgres -U postgres -d qbo > /backups/backup_$TIMESTAMP.sql
-          echo "Backup saved: backup_$TIMESTAMP.sql"
-          sleep 3600  # every hour
-        done
-      '
+      - ./backup.sh:/backup.sh
+    entrypoint: ["/bin/bash", "/backup.sh"]
 
   api-service:
     build: ./api-service
