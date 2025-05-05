@@ -39,6 +39,7 @@ services:
       - REDIRECT_URI=${REDIRECT_URI}
       - QBO_SANDBOX_BASE=${QBO_SANDBOX_BASE}
       - START_UP_PERIOD=${START_UP_PERIOD}
+      - USE_UI=${USE_UI}
     depends_on:
       - postgres
     ports:

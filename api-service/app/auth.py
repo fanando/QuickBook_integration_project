@@ -7,19 +7,20 @@ import time
 from typing import Optional,Tuple
 from datetime import datetime, timedelta
 from .db import get_stored_token
-from .config import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
+from .config import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI,USE_UI
 from .qb_client import save_tokens
 
 router = APIRouter(prefix="/auth")
-
+redirect_url = REDIRECT_URI if not USE_UI else "http://localhost:3000/auth/callback"
 
 @router.get("/authorize", response_class=RedirectResponse)
 def authorize() -> RedirectResponse:
     state: str = secrets.token_urlsafe(32)
+    
     auth_url: str = (
         "https://appcenter.intuit.com/connect/oauth2"
         f"?client_id={CLIENT_ID}"
-        f"&redirect_uri=http://localhost:8000/auth/callback"
+        f"&redirect_uri={redirect_url}"
         "&response_type=code"
         "&scope=com.intuit.quickbooks.accounting"
         f"&state={state}"
@@ -60,7 +61,7 @@ def callback(
         data={
             "grant_type": "authorization_code",
             "code": code,
-            "redirect_uri": 'http://localhost:8000/auth/callback',
+            "redirect_uri": redirect_url,
         },
     )
     if resp.status_code != 200:   
