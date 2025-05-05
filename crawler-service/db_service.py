@@ -17,7 +17,7 @@ def init_db() -> None:
             CREATE TABLE IF NOT EXISTS accounts (
                 id TEXT PRIMARY KEY,
                 payload JSONB NOT NULL,
-                cached_at DOUBLE PRECISION NOT NULL
+                cached_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
             );
         """)
         conn.commit()
