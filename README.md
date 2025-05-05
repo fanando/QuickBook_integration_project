@@ -59,11 +59,11 @@ docker-compose up --build
 
 | Mode      | USE_UI | Access via                     |
 |-----------|--------|--------------------------------|
-| UI Mode   | True   | `http://localhost:3000`        |
-| API Mode  | False  | Use Postman on port `8000`     |
+| UI Mode   | 1   | `http://localhost:3000`        |
+| API Mode  | 0   | Use Postman on port `8000`     |
 
-> When `USE_UI=True`, the app launches a React interface.  
-> When `USE_UI=False`, you can test endpoints using Postman or cURL.
+> When `USE_UI=1`, the app launches a React interface.  
+> When `USE_UI=0`, you can test endpoints using Postman or cURL.
 
 ---
 
